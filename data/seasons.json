@@ -163,8 +163,7 @@
       },
       "pot": "$250 buy-in",
       "pun": "Caddy SZN",
-      "punWho": "Jordan",
-      "photos": []
+      "punWho": "Jordan"
     },
     "2024": {
       "colOrder": [
@@ -220,8 +219,7 @@
       "weekly": null,
       "pot": "$250 buy-in",
       "pun": "Lap SZN",
-      "punWho": "AK",
-      "photos": []
+      "punWho": "AK"
     },
     "2025": {
       "colOrder": [
@@ -277,8 +275,7 @@
       "weekly": null,
       "pot": "$250 buy-in",
       "pun": "Monkey SZN",
-      "punWho": "Drew",
-      "photos": []
+      "punWho": "Drew"
     },
     "2026": {
       "colOrder": [
@@ -341,7 +338,6 @@
       "pot": "$250 buy-in \u00b7 winner takes all",
       "pun": null,
       "punWho": null,
-      "photos": [],
       "baseline": "2025",
       "projections": {
         "source": "DraftKings",

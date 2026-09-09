@@ -175,12 +175,6 @@ tr.last .tbar i{background:var(--alert)}
 .punlist .nm{font-family:var(--disp);font-size:23px;font-weight:700;text-transform:uppercase;color:var(--alert);line-height:1}
 .punlist .what{font-size:14.5px;color:var(--ink-2)}
 .punlist .what em{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--faint);display:block;margin-top:4px;text-transform:uppercase}
-.gallery{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.gallery figure{margin:0;width:132px}
-.gallery img{width:132px;height:99px;object-fit:cover;border-radius:2px;border:1px solid var(--line-hot);display:block}
-.gallery figcaption{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--faint);margin-top:4px;text-transform:uppercase}
-.photoslot{margin-top:9px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--faint);border:1px dashed var(--line-hot);border-radius:2px;padding:9px 12px;display:inline-block}
 .pending{text-align:center;padding:56px 24px;background:var(--panel);border:1px dashed var(--line-hot);border-radius:var(--r)}
 .pending .big{font-family:var(--disp);font-size:44px;font-weight:800;text-transform:uppercase;color:var(--amber);line-height:1;margin:0 0 12px}
 .pending p{color:var(--ink-2);font-size:15.5px;line-height:1.6;max-width:56ch;margin:0 auto;}
@@ -549,12 +543,10 @@ function renderLedger(){
   <ul class="punlist">
     <li><span class="yr" style="color:var(--amber)">2026</span><span class="nm" style="color:var(--faint)">Pending</span>
       <span class="what" style="color:var(--dim)">Sentence not yet set<em>Season in progress</em></span></li>
-    ${done.map(y=>{const d=B[y], ph=d.S.photos||[];
+    ${done.map(y=>{const d=B[y];
       return `<li><span class="yr">${y}</span><span class="nm">${esc(FULL[d.S.punWho])}</span>
       <span class="what">${esc(d.S.pun)}<em>Finished ${fmt(d.lastp.val)} · ${fmt(d.par-d.lastp.val)} below par</em>
-      ${ph.length?`<div class="gallery">${ph.map(p=>
-        `<figure><img src="${p.src}" alt="${esc(p.cap||d.S.pun+" "+y)}" loading="lazy"><figcaption>${esc(p.cap||"")}</figcaption></figure>`).join("")}</div>`
-        :`<div class="photoslot">Photographic evidence pending</div>`}</span></li>`;}).join("")}</ul>
+</span></li>`;}).join("")}</ul>
   <div class="sechead" style="margin-top:34px"><h2>Career Draft Value</h2><span class="meta">Wins above round average, all seasons</span></div>
   <div class="board"><table><thead><tr><th class="l">Operative</th><th>Career value</th><th class="l">Best pick ever</th><th class="l">Worst pick ever</th></tr></thead><tbody>
     ${(()=>{const acc={};done.forEach(y=>B[y].rows.forEach(p=>{

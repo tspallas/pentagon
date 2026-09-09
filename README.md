@@ -31,13 +31,10 @@ Everything hand-maintained lives in `data/seasons.json`. Team names are plain
 team drafted twice.
 
 To add a season, copy the previous block and change the rosters. To record a punishment,
-set `pun` and `punWho`. To add photos, drop files in `photos/` and list them:
+set `pun` and `punWho`.
 
-```json
-"photos": [{ "src": "photos/2025-monkey-szn.jpg", "cap": "Monkey SZN" }]
-```
-
-Commit and push — the Action rebuilds and publishes within a couple of minutes.
+This site carries no photos or video by design — it is public, and the punishment footage
+stays out of it. Commit and push — the Action rebuilds and publishes within a couple of minutes.
 
 ## Running it locally
 

@@ -141,7 +141,7 @@ def main():
             "colOrder": s["colOrder"], "seats": s.get("seats"),
             "draft": picks, "rosters": rosters, "weekly": s.get("weekly"),
             "pot": s.get("pot"), "pun": s.get("pun"), "punWho": s.get("punWho"),
-            "photos": s.get("photos", []), "status": status,
+            "status": status,
         }
         if s.get("baseline"):
             out_seasons[year]["baseline"] = s["baseline"]

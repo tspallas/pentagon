@@ -1,0 +1,77 @@
+{
+  "league": {
+    "name": "The Pentagon",
+    "est": 2023,
+    "tieValue": 0.5,
+    "players": {
+      "Andy":   { "full": "Andy",   "call": "ANDY"  },
+      "AK":     { "full": "Alex",   "call": "KROPP" },
+      "Jordan": { "full": "Jordan", "call": "JFREE" },
+      "Trent":  { "full": "Trent",  "call": "TRENT" },
+      "Drew":   { "full": "Drew",   "call": "DREW"  }
+    }
+  },
+  "seasons": {
+    "2023": {
+      "colOrder": ["Andy", "AK", "Jordan", "Trent"],
+      "seats": null,
+      "rosters": {
+        "Andy":   ["Eagles", "Lions", "Saints", "Seahawks", "Titans", "Bears", "Texans", "Cardinals"],
+        "AK":     ["Chiefs", "Bengals", "Jaguars", "Jets", "Steelers", "Giants", "Commanders", "Rams"],
+        "Jordan": ["Cowboys", "Ravens", "Dolphins", "Chargers", "Packers", "Patriots", "Panthers", "Raiders"],
+        "Trent":  ["49ers", "Bills", "Browns", "Vikings", "Broncos", "Falcons", "Buccaneers", "Colts"]
+      },
+      "weekly": {
+        "Andy":   [3,4,5,5,4,2,3,5,3,5,3,3,3,3,4,4,4,5],
+        "AK":     [4,4,3,3,5,6,4,3,4,1,3,5,2,3,3,3,4,6],
+        "Jordan": [5,3,4,3,2,4,2,5,4,2,4,4,4,3,4,5,3,3],
+        "Trent":  [4,5,4,5,3,3,4,3,3,6,4,4,4,6,5,4,5,2]
+      },
+      "pot": "$250 buy-in · 750 first · 250 second",
+      "pun": "Caddy SZN", "punWho": "Jordan", "photos": []
+    },
+    "2024": {
+      "colOrder": ["Andy", "AK", "Jordan", "Trent", "Drew"],
+      "seats": null,
+      "rosters": {
+        "Andy":   ["Lions", "Eagles", "Jaguars", "Seahawks", "Commanders", "Panthers"],
+        "AK":     ["Ravens", "Jets", "Dolphins", "Bears", "Saints", "Broncos"],
+        "Jordan": ["Cowboys", "Bengals", "Chargers", "Rams", "Cardinals", "Raiders"],
+        "Trent":  ["49ers", "Bills", "Falcons", "Browns", "Colts", "Vikings"],
+        "Drew":   ["Chiefs", "Packers", "Texans", "Buccaneers", "Steelers", "Titans"]
+      },
+      "weekly": null,
+      "pot": "$250 buy-in · 1000 first · 250 second",
+      "pun": "Lap SZN", "punWho": "AK", "photos": []
+    },
+    "2025": {
+      "colOrder": ["Andy", "AK", "Jordan", "Trent", "Drew"],
+      "seats": null,
+      "rosters": {
+        "Andy":   ["Ravens", "Broncos", "Bengals", "Seahawks", "Jaguars", "Giants"],
+        "AK":     ["Eagles", "Commanders", "Chargers", "Vikings", "Dolphins", "Colts"],
+        "Jordan": ["Packers", "49ers", "Patriots", "Cardinals", "Raiders", "Panthers"],
+        "Trent":  ["Bills", "Buccaneers", "Texans", "Bears", "Steelers", "Jets"],
+        "Drew":   ["Chiefs", "Lions", "Rams", "Falcons", "Cowboys", "Titans"]
+      },
+      "weekly": null,
+      "pot": "$250 buy-in · 1000 first · 250 second",
+      "pun": "Monkey SZN", "punWho": "Drew", "photos": []
+    },
+    "2026": {
+      "colOrder": ["Drew", "AK", "Jordan", "Trent", "Andy"],
+      "seats":    ["Drew", "AK", "Jordan", "Trent", "Andy"],
+      "rosters": {
+        "Drew":   ["Rams", "Broncos", "Cowboys", "Panthers", "Colts", "Browns"],
+        "AK":     ["Ravens", "Chiefs", "Eagles", "Buccaneers", "Steelers", "Raiders"],
+        "Jordan": ["Lions", "Patriots", "Bengals", "Vikings", "Saints", "Titans"],
+        "Trent":  ["Bills", "49ers", "Chargers", "Packers", "Giants", "Falcons"],
+        "Andy":   ["Seahawks", "Texans", "Bears", "Jaguars", "Commanders", "Jets"]
+      },
+      "weekly": null,
+      "pot": "$250 buy-in · 1000 first · 250 second",
+      "pun": null, "punWho": null, "photos": [],
+      "baseline": "2025"
+    }
+  }
+}

@@ -1,0 +1,571 @@
+<title>The Pentagon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#0B1014;--panel:#131B21;--panel2:#1A242B;--panel3:#22303A;
+  --line:#2A3841;--line-hot:#3C505C;
+  --ink:#DCE5E9;--ink-2:#A8B8C1;--dim:#7D8F9A;--faint:#556670;
+  --amber:#E8A33D;--amber-dim:#8A6224;--cyan:#4FB3C7;--drab:#6B7355;
+  --alert:#C8443A;--ok:#5C9E6B;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:"Big Shoulders Display","Barlow Condensed",Impact,sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;--r:3px;}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);margin:0;
+  background-image:linear-gradient(var(--panel) 1px,transparent 1px),linear-gradient(90deg,var(--panel) 1px,transparent 1px);
+  background-size:64px 64px;background-position:-1px -1px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 72px}
+.classbar{background:var(--drab);color:#0B1014;font-family:var(--mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;padding:5px 0;position:sticky;top:0;z-index:40;border-bottom:1px solid #0B1014}
+.classbar .inner{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
+header.mast{display:flex;gap:22px;align-items:center;padding:30px 0 22px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.seal{flex:none;width:74px;height:74px}
+.mast h1{font-family:var(--disp);font-weight:800;font-size:clamp(44px,7vw,74px);line-height:.86;margin:0;
+  letter-spacing:.005em;text-transform:uppercase;text-wrap:balance}
+.mast h1 em{font-style:normal;color:var(--amber)}
+.mast .sub{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-top:9px}
+.mast .sub span{color:var(--cyan)}
+.mast-right{margin-left:auto;flex:none}
+.seasonsel{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.seasonsel button{background:transparent;border:0;border-left:1px solid var(--line);color:var(--dim);
+  font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;padding:9px 15px;cursor:pointer}
+.seasonsel button:first-child{border-left:0}
+.seasonsel button[aria-pressed="true"]{background:var(--amber);color:#0B1014;font-weight:600}
+.seasonsel button:hover:not([aria-pressed="true"]){color:var(--ink);background:var(--panel2)}
+.seasonsel button:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px}
+nav.rail{display:flex;gap:2px;margin:26px 0 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+nav.rail::-webkit-scrollbar{display:none}
+nav.rail button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--dim);
+  font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  padding:12px 17px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+nav.rail button:hover{color:var(--ink)}
+nav.rail button[aria-selected="true"]{color:var(--amber);border-bottom-color:var(--amber)}
+nav.rail button:focus-visible{outline:1px solid var(--cyan);outline-offset:-3px}
+nav.rail .idx{color:var(--faint);margin-right:7px}
+nav.rail button[aria-selected="true"] .idx{color:var(--amber-dim)}
+.panel-body{padding-top:30px}
+[hidden]{display:none!important}
+.sechead{display:flex;align-items:baseline;gap:12px;margin:0 0 15px;flex-wrap:wrap}
+.sechead h2{font-family:var(--disp);font-weight:700;font-size:27px;text-transform:uppercase;letter-spacing:.02em;margin:0}
+.sechead .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;margin-left:auto}
+.sitrep{display:grid;grid-template-columns:minmax(0,410px) minmax(0,1fr);gap:26px;align-items:start}
+@media(max-width:900px){.sitrep{grid-template-columns:1fr}}
+.plot{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px 12px}
+.plot h3{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--dim);margin:0 0 4px}
+.plot .legend{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.1em;margin:4px 0 0;line-height:1.7}
+.plot .legend b{color:var(--ink-2);font-weight:500}
+#sweep{transform-origin:210px 200px;animation:sweep 12s linear infinite}
+@keyframes sweep{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#sweep{animation:none;opacity:.2}}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+thead th{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--faint);text-align:right;padding:11px 12px;border-bottom:1px solid var(--line);background:var(--panel2)}
+thead th.l{text-align:left}
+tbody td{padding:13px 12px;border-bottom:1px solid var(--line);text-align:right;font-size:15px;color:var(--ink-2)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--panel2)}
+td.rk{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--faint);width:1%;text-align:left;padding-right:0}
+td.ring{width:1%;text-align:left}
+td.op{text-align:left}
+.opname{font-family:var(--disp);font-size:25px;font-weight:700;text-transform:uppercase;line-height:1;color:var(--ink);letter-spacing:.01em}
+.opcall{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--faint);margin-top:3px}
+.ringbadge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+  border:1px solid var(--line-hot);border-radius:50%;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--dim)}
+tr.lead td{background:rgba(232,163,61,.055)}
+tr.lead .opname,tr.lead td.rk,tr.lead td.tot{color:var(--amber)}
+tr.lead .ringbadge{border-color:var(--amber);color:var(--amber)}
+tr.last .opname{color:var(--alert)}
+tr.last .ringbadge{border-color:var(--alert);color:var(--alert)}
+td.tot{font-family:var(--mono);font-size:23px;font-weight:600;color:var(--ink)}
+.rec,.gapcell{font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+.gapcell{color:var(--faint)}
+.par{font-family:var(--mono);font-size:12.5px;font-weight:500}
+.par.up{color:var(--ok)}.par.dn{color:var(--alert)}.par.ev{color:var(--dim)}
+.trend{width:118px}
+.tbar{height:7px;background:var(--panel3);border-radius:1px;overflow:hidden;position:relative}
+.tbar i{position:absolute;inset:0 auto 0 0;background:var(--cyan);display:block}
+tr.lead .tbar i{background:var(--amber)}
+tr.last .tbar i{background:var(--alert)}
+.parmark{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--line-hot)}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r);margin-top:20px;overflow:hidden}
+.strip div{background:var(--panel);padding:14px 15px}
+.strip dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--faint);margin:0}
+.strip dd{margin:7px 0 0;font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.strip dd small{font-size:12px;color:var(--dim);font-weight:400;margin-left:4px}
+.strip dd.amb{color:var(--amber)}.strip dd.al{color:var(--alert)}
+.ringe{margin-top:20px;border:1px solid #5E2A26;border-left:3px solid var(--alert);border-radius:var(--r);
+  background:linear-gradient(90deg,rgba(200,68,58,.1),rgba(200,68,58,.01));padding:15px 18px;
+  display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.ringe .hd{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.19em;color:var(--alert);text-transform:uppercase}
+.ringe .who{font-family:var(--disp);font-size:34px;font-weight:700;text-transform:uppercase;color:var(--alert);line-height:.9;margin-top:5px}
+.ringe .det{font-size:14.5px;color:var(--ink-2);line-height:1.55;max-width:52ch;margin:0}
+.ringe .det b{color:var(--ink);font-weight:600}
+.ringe .marg{margin-left:auto;text-align:right;font-family:var(--mono)}
+.ringe .marg b{display:block;font-size:25px;color:var(--ink)}
+.ringe .marg span{font-size:9.5px;letter-spacing:.15em;color:var(--faint)}
+.dossiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px}
+.dos{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column}
+.dos.champ{border-color:var(--amber-dim)}
+.dos.bottom{border-color:#5E2A26}
+.dos-hd{padding:15px 16px 13px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start;background:var(--panel2)}
+.dos.champ .dos-hd{background:linear-gradient(180deg,rgba(232,163,61,.1),transparent)}
+.dos.bottom .dos-hd{background:linear-gradient(180deg,rgba(200,68,58,.1),transparent)}
+.dos-hd .nm{font-family:var(--disp);font-size:30px;font-weight:700;text-transform:uppercase;line-height:.95;margin:0}
+.dos.champ .nm{color:var(--amber)}.dos.bottom .nm{color:var(--alert)}
+.dos-hd .cs{font-family:var(--mono);font-size:9.5px;letter-spacing:.17em;color:var(--faint);margin-top:5px}
+.dos-hd .agg{margin-left:auto;text-align:right;flex:none}
+.dos-hd .agg b{display:block;font-family:var(--mono);font-size:27px;font-weight:600;line-height:1}
+.dos.champ .agg b{color:var(--amber)}
+.dos-hd .agg span{font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--faint);display:block;margin-top:5px}
+.roster{list-style:none;margin:0;padding:0}
+.roster li{display:grid;grid-template-columns:9px 40px 1fr auto;gap:11px;align-items:center;
+  padding:9px 16px;border-bottom:1px solid #1C262D;font-size:14px}
+.roster li:last-child{border-bottom:0}
+.chip{width:9px;height:9px;border-radius:1px;box-shadow:0 0 0 1px rgba(255,255,255,.14) inset}
+.abbr{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink-2);letter-spacing:.05em}
+.tname{color:var(--dim);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.twl{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
+.dos-ft{margin-top:auto;padding:11px 16px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;
+  letter-spacing:.13em;color:var(--faint);text-transform:uppercase;display:flex;justify-content:space-between;gap:10px}
+.unclaimed{margin-top:16px;background:var(--panel);border:1px dashed var(--line-hot);border-radius:var(--r);
+  padding:14px 17px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.unclaimed .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.unclaimed .u{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
+.unclaimed .u s{text-decoration:none;color:var(--dim)}
+.dboard{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.dboard table{min-width:720px}
+.dboard th.rdlbl{text-align:left;font-family:var(--mono);font-size:10px;color:var(--faint);width:1%;white-space:nowrap;
+  background:var(--panel2);border-right:1px solid var(--line);padding:11px 12px}
+.dboard thead th.seat{text-align:center;font-family:var(--disp);font-size:21px;font-weight:700;letter-spacing:.03em;
+  color:var(--ink);text-transform:uppercase;padding:10px 8px}
+.dboard thead th.seat span{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--faint);margin-top:3px}
+.dboard tbody td{text-align:center;padding:0;border-right:1px solid #1C262D;border-bottom:1px solid #1C262D}
+.dboard tbody td:last-child{border-right:0}
+.dboard tbody th.rdlbl{border-bottom:1px solid #1C262D}
+.pick{padding:11px 9px;display:flex;flex-direction:column;gap:3px;align-items:center;position:relative}
+.pick .pno{font-family:var(--mono);font-size:9px;color:var(--faint);letter-spacing:.1em}
+.pick .pab{font-family:var(--disp);font-size:24px;font-weight:700;line-height:1;color:var(--ink)}
+.pick .pw{font-family:var(--mono);font-size:10.5px;color:var(--dim)}
+.pick .bar{position:absolute;left:0;top:0;bottom:0;width:3px}
+.snake{font-family:var(--mono);font-size:10px;color:var(--amber-dim);letter-spacing:.1em;display:block;margin-top:2px}
+.racewrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 10px;overflow-x:auto}
+.racewrap svg{min-width:640px;display:block}
+.stub{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:24px 26px}
+.stub h3{font-family:var(--disp);font-size:24px;font-weight:700;text-transform:uppercase;margin:0 0 6px}
+.stub p{color:var(--ink-2);font-size:15px;line-height:1.6;max-width:68ch;margin:0 0 18px}
+.reqs{list-style:none;margin:0;padding:0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r)}
+.reqs li{background:var(--panel2);padding:12px 15px;display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:baseline}
+.reqs .n{font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:.1em}
+.reqs .t{font-size:14.5px;color:var(--ink-2);line-height:1.5}
+.reqs .t b{color:var(--ink);font-weight:600}
+.medal{font-family:var(--mono);font-size:12px}
+.tt{color:var(--amber);font-weight:600}
+.ee{color:var(--alert);font-weight:600}
+.punlist{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r)}
+.punlist li{background:var(--panel2);padding:14px 16px;display:grid;grid-template-columns:58px 92px 1fr;gap:14px;align-items:center}
+.punlist .yr{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--faint)}
+.punlist .nm{font-family:var(--disp);font-size:23px;font-weight:700;text-transform:uppercase;color:var(--alert);line-height:1}
+.punlist .what{font-size:14.5px;color:var(--ink-2)}
+.punlist .what em{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--faint);display:block;margin-top:4px;text-transform:uppercase}
+.gallery{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.gallery figure{margin:0;width:132px}
+.gallery img{width:132px;height:99px;object-fit:cover;border-radius:2px;border:1px solid var(--line-hot);display:block}
+.gallery figcaption{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--faint);margin-top:4px;text-transform:uppercase}
+.photoslot{margin-top:9px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);border:1px dashed var(--line-hot);border-radius:2px;padding:9px 12px;display:inline-block}
+.pending{text-align:center;padding:56px 24px;background:var(--panel);border:1px dashed var(--line-hot);border-radius:var(--r)}
+.pending .big{font-family:var(--disp);font-size:44px;font-weight:800;text-transform:uppercase;color:var(--amber);line-height:1;margin:0 0 12px}
+.pending p{color:var(--ink-2);font-size:15.5px;line-height:1.6;max-width:56ch;margin:0 auto;}
+.pending .sm{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;margin-bottom:16px}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+</style>
+
+<div class="classbar"><div class="inner">
+  <b>Unclassified // For League Use Only</b>
+  <b id="cb-season">—</b>
+  <b id="cb-sync">Feed: ESPN</b>
+</div></div>
+
+<div class="wrap">
+<header class="mast">
+  <svg class="seal" viewBox="0 0 100 100" aria-hidden="true">
+    <g fill="none" stroke="#E8A33D" stroke-width="2.4">
+      <polygon points="50,7 92,37 76,87 24,87 8,37"/>
+      <polygon points="50,20 80,42 68,78 32,78 20,42" stroke-width="1.6" stroke-opacity=".7"/>
+      <polygon points="50,33 68,46 61,68 39,68 32,46" stroke-width="1.2" stroke-opacity=".45"/>
+    </g><circle cx="50" cy="52" r="4.5" fill="#E8A33D"/>
+  </svg>
+  <div>
+    <h1>The <em>Pentagon</em></h1>
+    <div class="sub">NFL Franchise Draft League · Est. <span>2023</span> · Most Collective Wins Takes It · <span>Ties Count Half</span> · <span>Order Drawn At Random</span></div>
+  </div>
+  <div class="mast-right"><div class="seasonsel" id="seasonsel" role="group" aria-label="Season"></div></div>
+</header>
+
+<nav class="rail" role="tablist" aria-label="Sections">
+  <button role="tab" id="t-sitrep"  aria-controls="p-sitrep"  aria-selected="true"><span class="idx">01</span>Sitrep</button>
+  <button role="tab" id="t-dossier" aria-controls="p-dossier" aria-selected="false"><span class="idx">02</span>Dossiers</button>
+  <button role="tab" id="t-draft"   aria-controls="p-draft"   aria-selected="false"><span class="idx">03</span>Draft Board</button>
+  <button role="tab" id="t-race"    aria-controls="p-race"    aria-selected="false"><span class="idx">04</span>The Race</button>
+  <button role="tab" id="t-archive" aria-controls="p-archive" aria-selected="false"><span class="idx">05</span>Archive</button>
+  <button role="tab" id="t-ledger"  aria-controls="p-ledger"  aria-selected="false"><span class="idx">06</span>The Ledger</button>
+</nav>
+
+<div class="panel-body">
+  <section id="p-sitrep"  role="tabpanel" aria-labelledby="t-sitrep"></section>
+  <section id="p-dossier" role="tabpanel" aria-labelledby="t-dossier" hidden></section>
+  <section id="p-draft"   role="tabpanel" aria-labelledby="t-draft" hidden></section>
+  <section id="p-race"    role="tabpanel" aria-labelledby="t-race" hidden></section>
+  <section id="p-archive" role="tabpanel" aria-labelledby="t-archive" hidden></section>
+  <section id="p-ledger"  role="tabpanel" aria-labelledby="t-ledger" hidden></section>
+</div>
+
+<footer>
+  <span>The Pentagon · Est. 2023</span>
+  <span>Standings: ESPN public feed</span>
+  <span>Unclassified // For League Use Only</span>
+</footer>
+</div>
+
+<script>
+/*__DATA__*/
+
+const TEAMS={ARI:["Cardinals","#97233F"],ATL:["Falcons","#A71930"],BAL:["Ravens","#3B2E8F"],BUF:["Bills","#00338D"],
+CAR:["Panthers","#0085CA"],CHI:["Bears","#1B3D6E"],CIN:["Bengals","#FB4F14"],CLE:["Browns","#6B4423"],
+DAL:["Cowboys","#3B5A8F"],DEN:["Broncos","#FB4F14"],DET:["Lions","#0076B6"],GB:["Packers","#2E6B41"],
+HOU:["Texans","#1A5B7A"],IND:["Colts","#0F4C93"],JAX:["Jaguars","#0F8A9E"],KC:["Chiefs","#E31837"],
+LAC:["Chargers","#0080C6"],LAR:["Rams","#2E5BB8"],LV:["Raiders","#A5ACAF"],MIA:["Dolphins","#008E97"],
+MIN:["Vikings","#6B3AA8"],NE:["Patriots","#3A5C8C"],NO:["Saints","#D3BC8D"],NYG:["Giants","#2A4A9E"],
+NYJ:["Jets","#1E7A52"],PHI:["Eagles","#00707A"],PIT:["Steelers","#FFB612"],SEA:["Seahawks","#4E9C3F"],
+SF:["49ers","#AA0000"],TB:["Buccaneers","#D50A0A"],TEN:["Titans","#4B92DB"],WSH:["Commanders","#8A2A2A"]};
+const fmt=n=>Number.isInteger(n)?String(n):n.toFixed(1);
+const signed=n=>(n>0.049?"+":n<-0.049?"−":"±")+fmt(Math.abs(Math.round(n*10)/10));
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+/* ---------- build a season ---------- */
+function build(y){
+  const S=SEASONS[y], rec=REC[y], base=S.baseline?REC[S.baseline]:null;
+  const played=Object.values(rec).some(r=>r[0]+r[1]+r[2]>0);
+  const rows=S.players.map(p=>{
+    let teams=S.rosters[p].map(ab=>{
+      const[w,l,t]=rec[ab], gp=w+l+t, d=S.draft?S.draft.find(x=>x.p===p&&x.ab===ab):null;
+      return{ab,w,l,t,gp,pts:w+t*0.5,proj:gp?(w+t*0.5)/gp*17:null,
+        rd:d?d.rd:null,pick:d?d.pick:null,
+        base:base?base[ab][0]+base[ab][2]*0.5:null,
+        baseRec:base?base[ab]:null};
+    });
+    if(S.draft) teams.sort((a,b)=>a.pick-b.pick);
+    const pts=teams.reduce((s,t)=>s+t.pts,0);
+    const bs=base?teams.reduce((s,t)=>s+t.base,0):null;
+    return {p,name:FULL[p],call:CALL[p],teams,pts,base:bs,
+      val:played?pts:(bs!==null?bs:pts),
+      proj:played?teams.reduce((s,t)=>s+(t.proj!==null?t.proj:0),0):null,
+      w:teams.reduce((s,t)=>s+t.w,0),l:teams.reduce((s,t)=>s+t.l,0),t:teams.reduce((s,t)=>s+t.t,0)};
+  });
+  const ranked=[...rows].sort((a,b)=>b.val-a.val);
+  ranked.forEach((r,i)=>{r.rank=i+1;r.ring="ABCDE"[i];});
+  const drafted=new Set(rows.flatMap(r=>r.teams.map(t=>t.ab)));
+  const und=Object.keys(TEAMS).filter(t=>!drafted.has(t));
+  if(S.draft&&S.status==="final"){
+    for(let r=1;r<=S.size;r++){
+      const inR=rows.flatMap(p=>p.teams.filter(t=>t.rd===r));
+      const avg=inR.reduce((a,t)=>a+t.pts,0)/inR.length;
+      inR.forEach(t=>{t.dv=t.pts-avg;t.ravg=avg;});
+    }
+    rows.forEach(p=>p.dval=p.teams.reduce((a,t)=>a+(t.dv||0),0));
+  }
+  const gamesPlayed=rows.reduce((s,r)=>s+r.teams.reduce((a,t)=>a+t.gp,0),0);
+  return {S,y,rows,ranked,und,played,gamesPlayed,par:272/32*S.size,
+    lead:ranked[0],lastp:ranked[ranked.length-1],max:Math.max(...ranked.map(r=>r.val))||1};
+}
+const B={};YEARS.forEach(y=>B[y]=build(y));
+
+/* ---------- ring plot ---------- */
+function ringSVG(d){
+  const n=d.ranked.length, CX=210,CY=200,RMIN=40,RMAX=152;
+  const ang=i=>(-90+i*(360/n))*Math.PI/180;
+  const pt=(r,i)=>[CX+r*Math.cos(ang(i)),CY+r*Math.sin(ang(i))];
+  const poly=r=>Array.from({length:n},(_,i)=>pt(r,i).map(v=>v.toFixed(1)).join(",")).join(" ");
+  const rOf=k=>RMIN+(k-1)*(RMAX-RMIN)/(n-1);
+  let s=`<defs><linearGradient id="sw" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#4FB3C7" stop-opacity="0"/><stop offset="1" stop-color="#4FB3C7" stop-opacity=".2"/></linearGradient></defs>`;
+  s+=`<g id="sweep"><path d="M ${CX} ${CY} L ${CX+RMAX+8} ${CY-50} A ${RMAX+8} ${RMAX+8} 0 0 1 ${CX+RMAX+8} ${CY+6} Z" fill="url(#sw)"/></g>`;
+  for(let k=n;k>=1;k--){
+    const r=rOf(k),hot=k===1;
+    s+=`<polygon points="${poly(r)}" fill="none" stroke="${hot?"#8A6224":"#2A3841"}" stroke-width="${hot?1.6:1.1}"/>`;
+    s+=`<text x="${CX+3}" y="${(CY-r+13).toFixed(1)}" fill="#556670" font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="1.4">${"ABCDE"[k-1]}</text>`;
+  }
+  for(let i=0;i<n;i++){const[x,y]=pt(RMAX,i);
+    s+=`<line x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#22303A" stroke-width="1"/>`;}
+  s+=`<circle cx="${CX}" cy="${CY}" r="3" fill="#E8A33D"/>`;
+  d.rows.forEach((p,i)=>{
+    const r=rOf(p.rank),[x,y]=pt(r,i);
+    const c=p.rank===1?"#E8A33D":p.rank===n?"#C8443A":"#4FB3C7";
+    s+=`<line x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${c}" stroke-width="1.3" stroke-opacity=".5"/>`;
+    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.5" fill="#0B1014" stroke="${c}" stroke-width="2"/>`;
+    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.3" fill="${c}"/>`;
+    const[lx,ly]=pt(RMAX+27,i);
+    const a=Math.cos(ang(i));
+    const anchor=Math.abs(a)<0.2?"middle":a>0?"start":"end";
+    s+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" fill="${c}" font-family="Big Shoulders Display,sans-serif" font-size="20" font-weight="700">${p.call}</text>`;
+    s+=`<text x="${lx.toFixed(1)}" y="${(ly+13).toFixed(1)}" text-anchor="${anchor}" fill="#7D8F9A" font-family="IBM Plex Mono,monospace" font-size="11">${fmt(p.val)} W</text>`;
+  });
+  return `<svg viewBox="0 0 420 400" role="img" aria-label="Ring plot: each operative sits on their own spoke, closer to the center the higher they rank">${s}</svg>`;
+}
+
+/* ---------- panels ---------- */
+function stub(title,body){return `<div class="stub"><h3>${title}</h3><p>${body}</p></div>`;}
+
+function renderSitrep(d){
+  const el=document.getElementById("p-sitrep"), n=d.ranked.length;
+  const runnerUp=d.ranked[n-2], gap=runnerUp.val-d.lastp.val;
+  const live=d.played, metric=live?"Wins":`${d.S.baseline} Wins`;
+  const banner=live?"":`<div class="ringe" style="border-color:var(--amber-dim);border-left-color:var(--amber);
+      background:linear-gradient(90deg,rgba(232,163,61,.09),rgba(232,163,61,.01));margin:0 0 20px">
+      <div><div class="hd" style="color:var(--amber)">Pre-kickoff · No games played</div>
+      <p class="det" style="margin-top:8px">The ${d.y} draft is in the books and Week 1 has not kicked off. The board below ranks each roster by
+      <b>what these exact teams won in ${d.S.baseline}</b> — a baseline, not a projection. Real standings replace it the moment games are played.</p></div></div>`;
+  el.innerHTML=banner+`<div class="sitrep">
+    <div class="plot"><h3>Ring Assignment</h3>${ringSVG(d)}
+      <p class="legend"><b>Ring A</b> is the Pentagon's innermost corridor &mdash; first place.<br>
+      <b>Ring ${"ABCDE"[n-1]}</b> is the outer wall. Standing there in January costs you.</p></div>
+    <div>
+      <div class="sechead"><h2>Standing Orders</h2><span class="meta">${d.S.status==="final"?"Regular season · final":live?"In progress":"Pre-kickoff baseline"}</span></div>
+      <div class="board"><table><thead><tr>
+        <th class="l">#</th><th class="l">Ring</th><th class="l">Operative</th>
+        <th>${metric}</th>${live?"<th>Record</th><th>Proj</th>":""}<th>vs Par</th><th>Back</th><th class="trend">Share of Field</th>
+      </tr></thead><tbody>${d.ranked.map(p=>{
+        const diff=p.val-d.par, cls=diff>0.049?"up":diff<-0.049?"dn":"ev";
+        return `<tr class="${p.rank===1?"lead":p.rank===n?"last":""}">
+          <td class="rk">${p.rank}</td><td class="ring"><span class="ringbadge">${p.ring}</span></td>
+          <td class="op"><div class="opname">${esc(p.name)}</div><div class="opcall">CALLSIGN ${p.call}</div></td>
+          <td class="tot">${fmt(p.val)}</td>
+          ${live?`<td class="rec">${p.w}–${p.l}${p.t?"–"+p.t:""}</td><td class="par ev">${p.proj?p.proj.toFixed(1):"—"}</td>`:""}
+          <td class="par ${cls}">${signed(diff)}</td>
+          <td class="gapcell">${p.rank===1?"—":"−"+fmt(d.lead.val-p.val)}</td>
+          <td class="trend"><div class="tbar"><i style="width:${Math.round(p.val/d.max*100)}%"></i><span class="parmark" style="left:${Math.round(d.par/d.max*100)}%"></span></div></td>
+        </tr>`;}).join("")}</tbody></table></div>
+      <dl class="strip">
+        <div><dt>${d.S.status==="final"?"Champion":"Front runner"}</dt><dd class="amb">${d.lead.call}</dd></div>
+        <div><dt>${d.S.status==="final"?"Winning total":"Leading total"}</dt><dd class="amb">${fmt(d.lead.val)}<small>wins</small></dd></div>
+        <div><dt>Margin</dt><dd>${fmt(d.lead.val-d.ranked[1].val)}<small>over ${d.ranked[1].call}</small></dd></div>
+        <div><dt>Par per roster</dt><dd>${d.par.toFixed(1)}</dd></div>
+        <div><dt>Unclaimed wins</dt><dd>${d.und.length?fmt(d.und.reduce((s,t)=>s+(live?REC[d.y][t][0]+REC[d.y][t][2]*0.5:REC[d.S.baseline][t][0]+REC[d.S.baseline][t][2]*0.5),0)):"—"}</dd></div>
+        <div><dt>Pot</dt><dd style="font-size:13px;line-height:1.5">${esc(d.S.pot)}</dd></div>
+      </dl>
+      <div class="ringe">
+        <div><div class="hd">Ring ${"ABCDE"[n-1]} Watch · Punishment on the line</div>
+          <div class="who">${esc(d.lastp.name)}</div>
+          <p class="det" style="margin-top:8px">${d.S.status==="final"
+            ?`Finished last at <b>${fmt(d.lastp.val)}</b> wins, ${fmt(d.par-d.lastp.val)} below par. Sentence: <b>${esc(d.S.pun)}</b>.`
+            :`Currently on the outer wall at <b>${fmt(d.lastp.val)}</b>${live?"":` ${d.S.baseline} wins`}. Sentence still to be set.`}</p></div>
+        <div class="marg"><b>${fmt(gap)}</b><span>BEHIND ${runnerUp.call}</span></div>
+      </div>
+    </div></div>`;
+}
+
+function renderDossier(d){
+  const el=document.getElementById("p-dossier"), n=d.ranked.length, live=d.played;
+  el.innerHTML=`<div class="sechead"><h2>Operative Dossiers</h2>
+    <span class="meta">${d.S.size} assets each · ${d.S.size*n} of 32 franchises claimed</span></div>
+    <div class="dossiers">${d.ranked.map(p=>{
+      const key=live?(a=>a.pts):(a=>a.base);
+      const st=[...p.teams].sort((a,b)=>key(b)-key(a));
+      return `<article class="dos ${p.rank===1?"champ":p.rank===n?"bottom":""}">
+        <div class="dos-hd"><div><h3 class="nm">${esc(p.name)}</h3>
+          <div class="cs">RING ${p.ring} · #${p.rank} OF ${n}${d.S.seats?" · SEAT "+(d.S.seats.indexOf(p.p)+1):""}</div></div>
+          <div class="agg"><b>${fmt(p.val)}</b><span>${live?"TOTAL WINS":d.S.baseline+" WINS"}</span></div></div>
+        <ul class="roster">${p.teams.map(t=>`<li>
+          <span class="chip" style="background:${TEAMS[t.ab][1]}"></span>
+          <span class="abbr">${t.ab}</span>
+          <span class="tname">${TEAMS[t.ab][0]}${t.pick?`<span class="rd" style="font-family:var(--mono);font-size:9.5px;color:var(--faint);margin-left:6px">R${t.rd}·P${t.pick}</span>`:""}</span>
+          <span class="twl">${live?`${t.w}–${t.l}${t.t?"–"+t.t:""}`:`<span style="color:var(--faint)">${t.baseRec[0]}–${t.baseRec[1]}${t.baseRec[2]?"–"+t.baseRec[2]:""}</span>`}</span></li>`).join("")}</ul>
+        <div class="dos-ft"><span>Best · ${st[0].ab} ${fmt(key(st[0]))}W</span><span>Worst · ${st[st.length-1].ab} ${fmt(key(st[st.length-1]))}W</span></div>
+      </article>`;}).join("")}</div>
+    <div class="unclaimed"><span class="lbl">Unclaimed · off the board</span>
+      ${d.und.length?d.und.map(t=>{const r=live?REC[d.y][t]:REC[d.S.baseline][t];
+        return `<span class="u"><span class="chip" style="background:${TEAMS[t][1]}"></span>${t} <s>${TEAMS[t][0]} · ${r[0]}–${r[1]}${live?" wasted":` in ${d.S.baseline}`}</s></span>`;}).join("")
+        :`<span class="u"><s>All 32 franchises drafted — nothing left on the board.</s></span>`}</div>
+    ${d.S.draft?"":`<div class="unclaimed" style="margin-top:12px"><span class="lbl">Note</span>
+      <span class="u"><s>Draft order was not recorded for ${d.y}; rosters appear in league-sheet order.</s></span></div>`}
+    ${live?"":`<div class="unclaimed" style="margin-top:12px"><span class="lbl">Reading it</span>
+      <span class="u"><s>Records shown are each franchise's ${d.S.baseline} finish — context for the pick, not a forecast.</s></span></div>`}`;
+}
+
+function renderDraft(d){
+  const el=document.getElementById("p-draft");
+  const cols=d.S.colOrder, rounds=d.S.size, live=d.played, snake=!!d.S.seats, fin=d.S.status==="final";
+  let h=`<thead><tr><th class="rdlbl">RD</th>${cols.map((p,i)=>
+    `<th class="seat">${esc(FULL[p])}${snake?`<span>SEAT ${i+1}</span>`:""}</th>`).join("")}</tr></thead><tbody>`;
+  for(let r=1;r<=rounds;r++){
+    h+=`<tr><th class="rdlbl">${r}${snake?`<span class="snake">${r%2?"▸ ▸":"◂ ◂"}</span>`:""}</th>`;
+    cols.forEach(p=>{
+      const k=d.S.draft.find(x=>x.p===p&&x.rd===r);
+      const rec=live?REC[d.y][k.ab]:REC[d.S.baseline][k.ab];
+      const t=d.rows.find(x=>x.p===p).teams.find(x=>x.ab===k.ab);
+      const dv=fin&&t.dv!==undefined?t.dv:null;
+      h+=`<td><div class="pick"><span class="bar" style="background:${TEAMS[k.ab][1]}"></span>
+        <span class="pno">${k.pick?"PICK "+k.pick:"ROUND "+r}</span><span class="pab">${k.ab}</span>
+        <span class="pw">${rec[0]}–${rec[1]}${rec[2]?"–"+rec[2]:""}${dv!==null?
+          ` <b style="font-weight:600;color:${dv>0.049?"var(--ok)":dv<-0.049?"var(--alert)":"var(--faint)"}">${signed(dv)}</b>`:""}</span></div></td>`;
+    });
+    h+="</tr>";
+  }
+  const vals=fin?[...d.rows].sort((a,b)=>b.dval-a.dval):null;
+  el.innerHTML=`<div class="sechead"><h2>Draft Board · ${d.y}</h2>
+    <span class="meta">${snake?"Snake":"By round"} · ${rounds} rounds · ${rounds*cols.length} picks</span></div>
+    <div class="dboard"><table>${h}</tbody></table></div>
+    <div class="unclaimed" style="margin-top:16px"><span class="lbl">Reading the board</span>
+      <span class="u"><s>Draft order is drawn at random every year. ${snake
+        ?"Seats run left to right; the snake reverses each round."
+        :"Seat order was not recorded for "+d.y+", so columns are league-sheet order and picks are shown by round only."}
+        ${fin?"The green or red figure is that pick's value — wins delivered against the average of every team taken in the same round.":""}</s></span></div>
+    ${fin?`<div class="sechead" style="margin-top:34px"><h2>Draft Value · ${d.y}</h2>
+      <span class="meta">Wins above the round average · zero-sum</span></div>
+    <div class="board"><table><thead><tr><th class="l">Operative</th><th>Value</th><th class="l">Best pick</th>
+      <th class="l">Worst pick</th><th class="trend">Spread</th></tr></thead><tbody>
+      ${vals.map(p=>{const st=[...p.teams].sort((a,b)=>b.dv-a.dv), mx=Math.max(...d.rows.map(r=>Math.abs(r.dval)))||1;
+        const w=Math.abs(p.dval)/mx*50;
+        return `<tr><td class="op"><div class="opname" style="font-size:21px">${esc(p.name)}</div></td>
+        <td class="par ${p.dval>0.049?"up":p.dval<-0.049?"dn":"ev"}" style="font-size:17px">${signed(p.dval)}</td>
+        <td class="op"><span class="rec" style="color:var(--ok)">${st[0].ab} R${st[0].rd} ${signed(st[0].dv)}</span></td>
+        <td class="op"><span class="rec" style="color:var(--alert)">${st[st.length-1].ab} R${st[st.length-1].rd} ${signed(st[st.length-1].dv)}</span></td>
+        <td class="trend"><div class="tbar" style="background:transparent"><span class="parmark" style="left:50%"></span>
+          <i style="left:${p.dval>=0?50:50-w}%;width:${w}%;background:${p.dval>=0?"var(--ok)":"var(--alert)"}"></i></div></td></tr>`;}).join("")}
+    </tbody></table></div>`:""}`;
+}
+
+function renderRace(d){
+  const el=document.getElementById("p-race"), wk=d.S.weekly;
+  if(!wk){el.innerHTML=`<div class="sechead"><h2>The Race</h2><span class="meta">Cumulative wins above par</span></div>`+
+    stub(d.y==="2026"?"Trace begins at kickoff":"Week-by-week not recorded",
+      d.y==="2026"
+      ?`Once Week 1 is in the books this chart draws itself every Tuesday straight from the ESPN feed — no manual entry. Each line tracks a roster's cumulative wins above par across the season. <b style="color:var(--amber)">Try 2023</b> to see it with real data.`
+      :`The league sheet only carries complete weekly splits for 2023. <b style="color:var(--amber)">Switch to 2023</b> to see the chart with real data.`);return;}
+  const names=d.S.players, W=18, wks=Array.from({length:W},(_,i)=>i+1);
+  const par=wks.map(i=>names.reduce((s,p)=>s+wk[p][i-1],0)/names.length);
+  const cum={};names.forEach(p=>{let a=0,c=0;cum[p]=wks.map(i=>{a+=wk[p][i-1];c+=par[i-1];return a-c;});});
+  const all=names.flatMap(p=>cum[p]);
+  const hi=Math.max(2,Math.ceil(Math.max(...all))), lo=Math.min(-2,Math.floor(Math.min(...all)));
+  const Wd=900,H=340,M={t:18,r:96,b:34,l:40};
+  const X=i=>M.l+i*(Wd-M.l-M.r)/(W-1), Y=v=>M.t+(hi-v)*(H-M.t-M.b)/(hi-lo);
+  const COL={Andy:"#E8A33D",AK:"#4FB3C7",Jordan:"#B07BD4",Trent:"#5C9E6B",Drew:"#D97757"};
+  let s="";
+  for(let g=lo;g<=hi;g++){
+    s+=`<line x1="${M.l}" y1="${Y(g).toFixed(1)}" x2="${Wd-M.r}" y2="${Y(g).toFixed(1)}" stroke="${g===0?"#3C505C":"#1C262D"}" stroke-width="1"/>`;
+    s+=`<text x="${M.l-8}" y="${(Y(g)+4).toFixed(1)}" text-anchor="end" fill="#556670" font-family="IBM Plex Mono,monospace" font-size="10">${g>0?"+"+g:g}</text>`;}
+  wks.filter(i=>i%3===0||i===1).forEach(i=>
+    s+=`<text x="${X(i-1).toFixed(1)}" y="${H-12}" text-anchor="middle" fill="#556670" font-family="IBM Plex Mono,monospace" font-size="10">${i}</text>`);
+  s+=`<text x="${M.l-8}" y="${H-12}" text-anchor="end" fill="#556670" font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="1.2">WK</text>`;
+  names.forEach(p=>{
+    s+=`<polyline points="${cum[p].map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${COL[p]}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const lx=X(W-1),ly=Y(cum[p][W-1]);
+    s+=`<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="4" fill="#0B1014" stroke="${COL[p]}" stroke-width="2"/>`;
+    s+=`<text x="${(lx+11).toFixed(1)}" y="${(ly+5).toFixed(1)}" fill="${COL[p]}" font-family="Big Shoulders Display,sans-serif" font-size="19" font-weight="700">${CALL[p]}</text>`;
+    s+=`<text x="${(lx+11).toFixed(1)}" y="${(ly+19).toFixed(1)}" fill="#7D8F9A" font-family="IBM Plex Mono,monospace" font-size="10">${signed(cum[p][W-1])}</text>`;});
+  el.innerHTML=`<div class="sechead"><h2>The Race &middot; ${d.y}</h2><span class="meta">Cumulative wins above par · 18 weeks</span></div>
+    <div class="racewrap"><svg viewBox="0 0 ${Wd} ${H}" role="img" aria-label="Cumulative wins above par by week, ${d.y}">${s}</svg></div>
+    <div class="unclaimed" style="margin-top:16px"><span class="lbl">Reading it</span>
+      <span class="u"><s>Zero is par. Above it you are beating the field's average roster; below it you are feeding the pot. ${esc(d.lead.name)} took the lead in Week 10 and never gave it back.</s></span></div>`;
+}
+
+function renderArchive(){
+  const el=document.getElementById("p-archive");
+  const done=YEARS.filter(y=>B[y].S.status==="final");
+  el.innerHTML=`<div class="sechead"><h2>Season Archive</h2><span class="meta">Permanent record · ${done.length} completed seasons</span></div>
+  <div class="board"><table><thead><tr>
+    <th class="l">Season</th><th class="l">Format</th><th class="l">Champion</th><th>Total</th>
+    <th class="l">Ring E</th><th>Total</th><th class="l">Punishment</th></tr></thead><tbody>
+    <tr><td class="rk" style="font-size:16px;color:var(--amber)">2026</td>
+      <td class="op"><span class="rec">5 players × 6</span></td>
+      <td class="op" colspan="5"><span class="rec">Season in progress — draft complete, awaiting Week 1</span></td></tr>
+    ${done.map(y=>{const d=B[y];
+      return `<tr><td class="rk" style="font-size:16px">${y}</td>
+      <td class="op"><span class="rec">${d.ranked.length} players × ${d.S.size}</span></td>
+      <td class="op"><div class="opname" style="font-size:21px;color:var(--amber)">${esc(d.lead.name)}</div></td>
+      <td class="tot" style="font-size:18px;color:var(--amber)">${fmt(d.lead.val)}</td>
+      <td class="op"><div class="opname" style="font-size:21px;color:var(--alert)">${esc(d.lastp.name)}</div></td>
+      <td class="tot" style="font-size:18px">${fmt(d.lastp.val)}</td>
+      <td class="op"><span class="rec" style="color:var(--ink-2)">${esc(d.S.pun)}</span></td></tr>`;}).join("")}
+  </tbody></table></div>`;
+}
+
+function renderLedger(){
+  const el=document.getElementById("p-ledger");
+  const done=YEARS.filter(y=>B[y].S.status==="final");
+  const car=["Andy","AK","Jordan","Trent","Drew"].map(p=>{
+    const ss=done.filter(y=>B[y].S.players.includes(p)), rk=ss.map(y=>B[y].ranked.find(r=>r.p===p));
+    return {p,name:FULL[p],call:CALL[p],n:ss.length,
+      titles:rk.filter(r=>r.rank===1).length, titleYrs:ss.filter((y,i)=>rk[i].rank===1).sort(),
+      lasts:rk.filter((r,i)=>r.rank===B[ss[i]].ranked.length).length,
+      lastYrs:ss.filter((y,i)=>rk[i].rank===B[y].ranked.length).sort(),
+      avg:rk.reduce((s,r)=>s+r.rank,0)/ss.length,
+      vpar:ss.reduce((s,y,i)=>s+(rk[i].val-B[y].par),0),
+      best:Math.max(...ss.map((y,i)=>rk[i].val-B[y].par))};
+  }).sort((a,b)=>b.titles-a.titles||b.vpar-a.vpar);
+  el.innerHTML=`<div class="sechead"><h2>The Ledger</h2><span class="meta">All-time · 2023–2025 · career service record</span></div>
+  <div class="board"><table><thead><tr>
+    <th class="l">Operative</th><th>Seasons</th><th>Titles</th><th>Ring E</th><th>Avg finish</th>
+    <th>Career vs par</th><th>Best season</th></tr></thead><tbody>
+    ${car.map(c=>`<tr class="${c.titles>=2?"lead":""}">
+      <td class="op"><div class="opname">${esc(c.name)}</div><div class="opcall">CALLSIGN ${c.call}</div></td>
+      <td class="rec">${c.n}</td>
+      <td class="medal">${c.titles?`<span class="tt">${"★".repeat(c.titles)}</span> <span style="color:var(--faint)">${c.titleYrs.join(", ")}</span>`:'<span style="color:var(--faint)">—</span>'}</td>
+      <td class="medal">${c.lasts?`<span class="ee">${"●".repeat(c.lasts)}</span> <span style="color:var(--faint)">${c.lastYrs.join(", ")}</span>`:'<span style="color:var(--faint)">—</span>'}</td>
+      <td class="rec">${c.avg.toFixed(2)}</td>
+      <td class="par ${c.vpar>0.049?"up":c.vpar<-0.049?"dn":"ev"}">${signed(c.vpar)}</td>
+      <td class="par ${c.best>0?"up":"dn"}">${signed(c.best)}</td></tr>`).join("")}
+  </tbody></table></div>
+  <div class="sechead" style="margin-top:34px"><h2>Punishment Archive</h2><span class="meta">The permanent part</span></div>
+  <ul class="punlist">
+    <li><span class="yr" style="color:var(--amber)">2026</span><span class="nm" style="color:var(--faint)">Pending</span>
+      <span class="what" style="color:var(--dim)">Sentence not yet set<em>Season in progress</em></span></li>
+    ${done.map(y=>{const d=B[y], ph=d.S.photos||[];
+      return `<li><span class="yr">${y}</span><span class="nm">${esc(FULL[d.S.punWho])}</span>
+      <span class="what">${esc(d.S.pun)}<em>Finished ${fmt(d.lastp.val)} · ${fmt(d.par-d.lastp.val)} below par</em>
+      ${ph.length?`<div class="gallery">${ph.map(p=>
+        `<figure><img src="${p.src}" alt="${esc(p.cap||d.S.pun+" "+y)}" loading="lazy"><figcaption>${esc(p.cap||"")}</figcaption></figure>`).join("")}</div>`
+        :`<div class="photoslot">Photographic evidence pending</div>`}</span></li>`;}).join("")}</ul>
+  <div class="sechead" style="margin-top:34px"><h2>Career Draft Value</h2><span class="meta">Wins above round average, all seasons</span></div>
+  <div class="board"><table><thead><tr><th class="l">Operative</th><th>Career value</th><th class="l">Best pick ever</th><th class="l">Worst pick ever</th></tr></thead><tbody>
+    ${(()=>{const acc={};done.forEach(y=>B[y].rows.forEach(p=>{
+      (acc[p.p]=acc[p.p]||{dv:0,picks:[]});acc[p.p].dv+=p.dval;
+      p.teams.forEach(t=>acc[p.p].picks.push({...t,y}));}));
+      return Object.keys(acc).map(p=>({p,...acc[p]})).sort((a,b)=>b.dv-a.dv).map(c=>{
+        const st=[...c.picks].sort((a,b)=>b.dv-a.dv), b0=st[0], w0=st[st.length-1];
+        return `<tr><td class="op"><div class="opname">${esc(FULL[c.p])}</div><div class="opcall">CALLSIGN ${CALL[c.p]}</div></td>
+        <td class="par ${c.dv>0.049?"up":c.dv<-0.049?"dn":"ev"}" style="font-size:17px">${signed(c.dv)}</td>
+        <td class="op"><span class="rec" style="color:var(--ok)">${b0.ab} · ${b0.y} R${b0.rd} · ${signed(b0.dv)}</span></td>
+        <td class="op"><span class="rec" style="color:var(--alert)">${w0.ab} · ${w0.y} R${w0.rd} · ${signed(w0.dv)}</span></td></tr>`;}).join("");})()}
+  </tbody></table></div>
+  <div class="unclaimed" style="margin-top:16px"><span class="lbl">Career vs par</span>
+    <span class="u"><s>Normalises across formats. 2023 ran four players holding eight teams (par 68); 2024 onward runs five holding six (par 51). Comparing raw totals across those eras is meaningless — comparing distance from par is not.</s></span></div>`;
+}
+
+/* ---------- wiring ---------- */
+let cur="2026";
+function render(){
+  const d=B[cur];
+  renderSitrep(d);renderDossier(d);renderDraft(d);renderRace(d);renderArchive();renderLedger();
+  document.getElementById("cb-season").textContent=
+    d.S.status==="final"?`Season ${cur} · Final`
+    :d.played?`Season ${cur} · In progress`:`Season ${cur} · Week 1 pending`;
+}
+document.getElementById("seasonsel").innerHTML=
+  YEARS.map(y=>`<button type="button" data-y="${y}" aria-pressed="${y===cur}">${y}</button>`).join("");
+document.querySelectorAll("#seasonsel button").forEach(b=>b.addEventListener("click",()=>{
+  cur=b.dataset.y;
+  document.querySelectorAll("#seasonsel button").forEach(o=>o.setAttribute("aria-pressed",o===b?"true":"false"));
+  render();}));
+const tabs=[...document.querySelectorAll("nav.rail button")];
+tabs.forEach(tb=>tb.addEventListener("click",()=>tabs.forEach(o=>{
+  const on=o===tb;o.setAttribute("aria-selected",on?"true":"false");
+  document.getElementById(o.getAttribute("aria-controls")).hidden=!on;})));
+document.getElementById("cb-sync").textContent="Feed: ESPN · Synced "+new Date().toISOString().slice(0,10);
+render();
+</script>

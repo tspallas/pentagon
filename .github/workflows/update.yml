@@ -1,0 +1,46 @@
+name: Update standings
+
+on:
+  schedule:
+    # 12:00 UTC daily — 8am Eastern in summer, 7am in winter.
+    # NFL games are settled by Tuesday morning, so this always catches the full week.
+    - cron: "0 12 * * *"
+  workflow_dispatch:        # adds a "Run workflow" button for manual refreshes
+  push:
+    branches: [main]
+    paths:
+      - "data/seasons.json" # editing rosters or punishments rebuilds the site
+      - "template.html"
+      - "scripts/build.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-standings
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild site from the ESPN feed
+        run: python3 scripts/build.py
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name  "pentagon-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No change — standings are already current."
+          else
+            git commit -m "Standings update $(date -u '+%Y-%m-%d')"
+            git push
+          fi

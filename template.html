@@ -107,6 +107,10 @@ tr.last .tbar i{background:var(--alert)}
 .ringe .marg{margin-left:auto;text-align:right;font-family:var(--mono)}
 .ringe .marg b{display:block;font-size:25px;color:var(--ink)}
 .ringe .marg span{font-size:9.5px;letter-spacing:.15em;color:var(--faint)}
+.call2{margin-top:20px;display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.call2 .r{background:var(--panel);padding:12px 16px;display:grid;grid-template-columns:104px 1fr;gap:14px;align-items:baseline}
+.call2 .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--amber)}
+.call2 .v{font-size:14px;color:var(--ink-2);line-height:1.55}
 .dossiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px}
 .dos{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column}
 .dos.champ{border-color:var(--amber-dim)}
@@ -250,11 +254,13 @@ const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[
 /* ---------- build a season ---------- */
 function build(y){
   const S=SEASONS[y], rec=REC[y], base=S.baseline?REC[S.baseline]:null;
+  const pj=(typeof PROJ!=="undefined"&&PROJ[y])?PROJ[y]:null;
   const played=Object.values(rec).some(r=>r[0]+r[1]+r[2]>0);
   const rows=S.players.map(p=>{
     let teams=S.rosters[p].map(ab=>{
       const[w,l,t]=rec[ab], gp=w+l+t, d=S.draft?S.draft.find(x=>x.p===p&&x.ab===ab):null;
-      return{ab,w,l,t,gp,pts:w+t*0.5,proj:gp?(w+t*0.5)/gp*17:null,
+      return{ab,w,l,t,gp,pts:w+t*0.5,pace:gp?(w+t*0.5)/gp*17:null,
+        vegas:pj?pj[ab]:null,
         rd:d?d.rd:null,pick:d?d.pick:null,
         base:base?base[ab][0]+base[ab][2]*0.5:null,
         baseRec:base?base[ab]:null};
@@ -262,12 +268,15 @@ function build(y){
     if(S.draft) teams.sort((a,b)=>a.pick-b.pick);
     const pts=teams.reduce((s,t)=>s+t.pts,0);
     const bs=base?teams.reduce((s,t)=>s+t.base,0):null;
-    return {p,name:FULL[p],call:CALL[p],teams,pts,base:bs,
-      val:played?pts:(bs!==null?bs:pts),
-      proj:played?teams.reduce((s,t)=>s+(t.proj!==null?t.proj:0),0):null,
+    const vg=pj?teams.reduce((s,t)=>s+t.vegas,0):null;
+    return {p,name:FULL[p],call:CALL[p],teams,pts,base:bs,vegas:vg,
+      val:played?pts:(vg!==null?vg:(bs!==null?bs:pts)),
+      vsVegas:(played&&vg!==null)?pts-vg:null,
+      pace:played?teams.reduce((s,t)=>s+(t.pace!==null?t.pace:0),0):null,
       w:teams.reduce((s,t)=>s+t.w,0),l:teams.reduce((s,t)=>s+t.l,0),t:teams.reduce((s,t)=>s+t.t,0)};
   });
-  const ranked=[...rows].sort((a,b)=>b.val-a.val);
+  // Ranking: total wins, then the house tiebreaker — wins against the preseason line.
+  const ranked=[...rows].sort((a,b)=>b.val-a.val||((b.vsVegas??-99)-(a.vsVegas??-99)));
   ranked.forEach((r,i)=>{r.rank=i+1;r.ring="ABCDE"[i];});
   const drafted=new Set(rows.flatMap(r=>r.teams.map(t=>t.ab)));
   const und=Object.keys(TEAMS).filter(t=>!drafted.has(t));
@@ -280,7 +289,7 @@ function build(y){
     rows.forEach(p=>p.dval=p.teams.reduce((a,t)=>a+(t.dv||0),0));
   }
   const gamesPlayed=rows.reduce((s,r)=>s+r.teams.reduce((a,t)=>a+t.gp,0),0);
-  return {S,y,rows,ranked,und,played,gamesPlayed,par:272/32*S.size,
+  return {S,y,rows,ranked,und,played,gamesPlayed,pj,par:272/32*S.size,
     lead:ranked[0],lastp:ranked[ranked.length-1],max:Math.max(...ranked.map(r=>r.val))||1};
 }
 const B={};YEARS.forEach(y=>B[y]=build(y));
@@ -324,48 +333,63 @@ function stub(title,body){return `<div class="stub"><h3>${title}</h3><p>${body}<
 function renderSitrep(d){
   const el=document.getElementById("p-sitrep"), n=d.ranked.length;
   const runnerUp=d.ranked[n-2], gap=runnerUp.val-d.lastp.val;
-  const live=d.played, metric=live?"Wins":`${d.S.baseline} Wins`;
+  const live=d.played, vg=!!d.pj;
+  const meta=(typeof PROJMETA!=="undefined"&&PROJMETA[d.y])?PROJMETA[d.y]:null;
+  const metric=live?"Wins":vg?"Vegas Line":`${d.S.baseline} Wins`;
   const banner=live?"":`<div class="ringe" style="border-color:var(--amber-dim);border-left-color:var(--amber);
       background:linear-gradient(90deg,rgba(232,163,61,.09),rgba(232,163,61,.01));margin:0 0 20px">
       <div><div class="hd" style="color:var(--amber)">Pre-kickoff · No games played</div>
-      <p class="det" style="margin-top:8px">The ${d.y} draft is in the books and Week 1 has not kicked off. The board below ranks each roster by
-      <b>what these exact teams won in ${d.S.baseline}</b> — a baseline, not a projection. Real standings replace it the moment games are played.</p></div></div>`;
+      <p class="det" style="margin-top:8px">${vg
+        ?`The ${d.y} draft is done and Week 1 has not kicked off. Rosters are ranked by their
+          <b>preseason win totals</b>${meta?` (${esc(meta.source)}, ${esc(meta.asOf)})`:""} — the market's number, not mine.
+          Those 32 lines add up to exactly 272, the whole season. Real standings replace this the moment games are played.`
+        :`The ${d.y} draft is done and Week 1 has not kicked off.`}</p></div></div>`;
   el.innerHTML=banner+`<div class="sitrep">
     <div class="plot"><h3>Ring Assignment</h3>${ringSVG(d)}
       <p class="legend"><b>Ring A</b> is the Pentagon's innermost corridor &mdash; first place.<br>
       <b>Ring ${"ABCDE"[n-1]}</b> is the outer wall. Standing there in January costs you.</p></div>
     <div>
-      <div class="sechead"><h2>Standing Orders</h2><span class="meta">${d.S.status==="final"?"Regular season · final":live?"In progress":"Pre-kickoff baseline"}</span></div>
-      <div class="board"><table><thead><tr>
+      <div class="sechead"><h2>Standing Orders</h2><span class="meta">${d.S.status==="final"?"Regular season · final":live?"In progress":"Pre-kickoff"}</span></div>
+      <div class="board" style="overflow-x:auto"><table><thead><tr>
         <th class="l">#</th><th class="l">Ring</th><th class="l">Operative</th>
-        <th>${metric}</th>${live?"<th>Record</th><th>Proj</th>":""}<th>vs Par</th><th>Back</th><th class="trend">Share of Field</th>
+        <th>${metric}</th>${live?`<th>Record</th><th>Pace</th>${vg?"<th>vs Vegas</th>":""}`:""}
+        <th>vs Par</th><th>Back</th><th class="trend">Share of Field</th>
       </tr></thead><tbody>${d.ranked.map(p=>{
         const diff=p.val-d.par, cls=diff>0.049?"up":diff<-0.049?"dn":"ev";
+        const vv=p.vsVegas;
         return `<tr class="${p.rank===1?"lead":p.rank===n?"last":""}">
           <td class="rk">${p.rank}</td><td class="ring"><span class="ringbadge">${p.ring}</span></td>
           <td class="op"><div class="opname">${esc(p.name)}</div><div class="opcall">CALLSIGN ${p.call}</div></td>
           <td class="tot">${fmt(p.val)}</td>
-          ${live?`<td class="rec">${p.w}–${p.l}${p.t?"–"+p.t:""}</td><td class="par ev">${p.proj?p.proj.toFixed(1):"—"}</td>`:""}
+          ${live?`<td class="rec">${p.w}–${p.l}${p.t?"–"+p.t:""}</td>
+                  <td class="par ev">${p.pace?p.pace.toFixed(1):"—"}</td>
+                  ${vg?`<td class="par ${vv>0.049?"up":vv<-0.049?"dn":"ev"}">${vv===null?"—":signed(vv)}</td>`:""}`:""}
           <td class="par ${cls}">${signed(diff)}</td>
           <td class="gapcell">${p.rank===1?"—":"−"+fmt(d.lead.val-p.val)}</td>
           <td class="trend"><div class="tbar"><i style="width:${Math.round(p.val/d.max*100)}%"></i><span class="parmark" style="left:${Math.round(d.par/d.max*100)}%"></span></div></td>
         </tr>`;}).join("")}</tbody></table></div>
       <dl class="strip">
-        <div><dt>${d.S.status==="final"?"Champion":"Front runner"}</dt><dd class="amb">${d.lead.call}</dd></div>
-        <div><dt>${d.S.status==="final"?"Winning total":"Leading total"}</dt><dd class="amb">${fmt(d.lead.val)}<small>wins</small></dd></div>
+        <div><dt>${d.S.status==="final"?"Champion":live?"Front runner":"Market favourite"}</dt><dd class="amb">${d.lead.call}</dd></div>
+        <div><dt>${d.S.status==="final"?"Winning total":live?"Leading total":"Vegas line"}</dt><dd class="amb">${fmt(d.lead.val)}<small>wins</small></dd></div>
         <div><dt>Margin</dt><dd>${fmt(d.lead.val-d.ranked[1].val)}<small>over ${d.ranked[1].call}</small></dd></div>
         <div><dt>Par per roster</dt><dd>${d.par.toFixed(1)}</dd></div>
-        <div><dt>Unclaimed wins</dt><dd>${d.und.length?fmt(d.und.reduce((s,t)=>s+(live?REC[d.y][t][0]+REC[d.y][t][2]*0.5:REC[d.S.baseline][t][0]+REC[d.S.baseline][t][2]*0.5),0)):"—"}</dd></div>
-        <div><dt>Pot</dt><dd style="font-size:13px;line-height:1.5">${esc(d.S.pot)}</dd></div>
+        <div><dt>Unclaimed</dt><dd>${d.und.length?fmt(d.und.reduce((s,t)=>s+(live?REC[d.y][t][0]+REC[d.y][t][2]*0.5:vg?d.pj[t]:REC[d.S.baseline][t][0]+REC[d.S.baseline][t][2]*0.5),0)):"—"}<small>${live?"wins":"line"}</small></dd></div>
+        <div><dt>Pot</dt><dd style="font-size:13px;line-height:1.5">${esc(d.S.pot||"")}</dd></div>
       </dl>
       <div class="ringe">
         <div><div class="hd">Ring ${"ABCDE"[n-1]} Watch · Punishment on the line</div>
           <div class="who">${esc(d.lastp.name)}</div>
           <p class="det" style="margin-top:8px">${d.S.status==="final"
             ?`Finished last at <b>${fmt(d.lastp.val)}</b> wins, ${fmt(d.par-d.lastp.val)} below par. Sentence: <b>${esc(d.S.pun)}</b>.`
-            :`Currently on the outer wall at <b>${fmt(d.lastp.val)}</b>${live?"":` ${d.S.baseline} wins`}. Sentence still to be set.`}</p></div>
+            :live?`Currently on the outer wall at <b>${fmt(d.lastp.val)}</b> wins.`
+            :`Lowest preseason line at <b>${fmt(d.lastp.val)}</b>. Nobody has lost anything yet.`}</p></div>
         <div class="marg"><b>${fmt(gap)}</b><span>BEHIND ${runnerUp.call}</span></div>
       </div>
+      ${typeof RULES!=="undefined"?`<div class="call2">
+        <div class="r"><span class="k">Payout</span><span class="v">${esc(RULES.payout||"")}</span></div>
+        <div class="r"><span class="k">Tiebreaker</span><span class="v">${esc(RULES.tiebreak||"")}</span></div>
+        <div class="r"><span class="k">Ties</span><span class="v">An NFL tie counts as half a win.</span></div>
+      </div>`:""}
     </div></div>`;
 }
 
@@ -374,17 +398,17 @@ function renderDossier(d){
   el.innerHTML=`<div class="sechead"><h2>Operative Dossiers</h2>
     <span class="meta">${d.S.size} assets each · ${d.S.size*n} of 32 franchises claimed</span></div>
     <div class="dossiers">${d.ranked.map(p=>{
-      const key=live?(a=>a.pts):(a=>a.base);
+      const key=live?(a=>a.pts):(d.pj?(a=>a.vegas):(a=>a.base));
       const st=[...p.teams].sort((a,b)=>key(b)-key(a));
       return `<article class="dos ${p.rank===1?"champ":p.rank===n?"bottom":""}">
         <div class="dos-hd"><div><h3 class="nm">${esc(p.name)}</h3>
           <div class="cs">RING ${p.ring} · #${p.rank} OF ${n}${d.S.seats?" · SEAT "+(d.S.seats.indexOf(p.p)+1):""}</div></div>
-          <div class="agg"><b>${fmt(p.val)}</b><span>${live?"TOTAL WINS":d.S.baseline+" WINS"}</span></div></div>
+          <div class="agg"><b>${fmt(p.val)}</b><span>${live?"TOTAL WINS":d.pj?"VEGAS LINE":d.S.baseline+" WINS"}</span></div></div>
         <ul class="roster">${p.teams.map(t=>`<li>
           <span class="chip" style="background:${TEAMS[t.ab][1]}"></span>
           <span class="abbr">${t.ab}</span>
           <span class="tname">${TEAMS[t.ab][0]}${t.pick?`<span class="rd" style="font-family:var(--mono);font-size:9.5px;color:var(--faint);margin-left:6px">R${t.rd}·P${t.pick}</span>`:""}</span>
-          <span class="twl">${live?`${t.w}–${t.l}${t.t?"–"+t.t:""}`:`<span style="color:var(--faint)">${t.baseRec[0]}–${t.baseRec[1]}${t.baseRec[2]?"–"+t.baseRec[2]:""}</span>`}</span></li>`).join("")}</ul>
+          <span class="twl">${live?`${t.w}–${t.l}${t.t?"–"+t.t:""}`:d.pj?`<span style="color:var(--cyan)">${t.vegas.toFixed(1)}</span>`:`<span style="color:var(--faint)">${t.baseRec[0]}–${t.baseRec[1]}</span>`}</span></li>`).join("")}</ul>
         <div class="dos-ft"><span>Best · ${st[0].ab} ${fmt(key(st[0]))}W</span><span>Worst · ${st[st.length-1].ab} ${fmt(key(st[st.length-1]))}W</span></div>
       </article>`;}).join("")}</div>
     <div class="unclaimed"><span class="lbl">Unclaimed · off the board</span>
@@ -394,7 +418,7 @@ function renderDossier(d){
     ${d.S.draft?"":`<div class="unclaimed" style="margin-top:12px"><span class="lbl">Note</span>
       <span class="u"><s>Draft order was not recorded for ${d.y}; rosters appear in league-sheet order.</s></span></div>`}
     ${live?"":`<div class="unclaimed" style="margin-top:12px"><span class="lbl">Reading it</span>
-      <span class="u"><s>Records shown are each franchise's ${d.S.baseline} finish — context for the pick, not a forecast.</s></span></div>`}`;
+      <span class="u"><s>${d.pj?`Numbers are each franchise's preseason win total${(typeof PROJMETA!=="undefined"&&PROJMETA[d.y])?" ("+PROJMETA[d.y].source+", "+PROJMETA[d.y].asOf+")":""} — the market's expectation, and the basis for the tiebreaker.`:`Records shown are each franchise's ${d.S.baseline} finish.`}</s></span></div>`}`;
 }
 
 function renderDraft(d){
@@ -406,12 +430,12 @@ function renderDraft(d){
     h+=`<tr><th class="rdlbl">${r}${snake?`<span class="snake">${r%2?"▸ ▸":"◂ ◂"}</span>`:""}</th>`;
     cols.forEach(p=>{
       const k=d.S.draft.find(x=>x.p===p&&x.rd===r);
-      const rec=live?REC[d.y][k.ab]:REC[d.S.baseline][k.ab];
+      const t0=live?REC[d.y][k.ab]:null;
       const t=d.rows.find(x=>x.p===p).teams.find(x=>x.ab===k.ab);
       const dv=fin&&t.dv!==undefined?t.dv:null;
       h+=`<td><div class="pick"><span class="bar" style="background:${TEAMS[k.ab][1]}"></span>
         <span class="pno">${k.pick?"PICK "+k.pick:"ROUND "+r}</span><span class="pab">${k.ab}</span>
-        <span class="pw">${rec[0]}–${rec[1]}${rec[2]?"–"+rec[2]:""}${dv!==null?
+        <span class="pw">${live?`${t0[0]}–${t0[1]}${t0[2]?"–"+t0[2]:""}`:d.pj?`<span style="color:var(--cyan)">${d.pj[k.ab].toFixed(1)}</span>`:"—"}${dv!==null?
           ` <b style="font-weight:600;color:${dv>0.049?"var(--ok)":dv<-0.049?"var(--alert)":"var(--faint)"}">${signed(dv)}</b>`:""}</span></div></td>`;
     });
     h+="</tr>";

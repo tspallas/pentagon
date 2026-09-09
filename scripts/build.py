@@ -11,7 +11,7 @@ No dependencies beyond the Python standard library.
     python3 scripts/build.py --all      # re-fetch every season
     python3 scripts/build.py --offline  # cache only, never hit the network
 """
-import json, os, sys, urllib.request, urllib.error, datetime
+import json, os, re, sys, urllib.request, urllib.error, datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA, CACHE = os.path.join(ROOT, "data"), os.path.join(ROOT, "data", "standings")
@@ -118,6 +118,7 @@ def main():
     mode = "all" if "--all" in sys.argv else "offline" if "--offline" in sys.argv else "auto"
     cfg = json.load(open(os.path.join(DATA, "seasons.json")))
     league, out_seasons, rec, any_change = cfg["league"], {}, {}, False
+    proj, projmeta = {}, {}
 
     for year in sorted(cfg["seasons"]):
         s = cfg["seasons"][year]
@@ -145,6 +146,16 @@ def main():
         if s.get("baseline"):
             out_seasons[year]["baseline"] = s["baseline"]
 
+        pj = s.get("projections")
+        if pj:
+            totals = {abbr(t): v for t, v in pj["totals"].items()}
+            if len(totals) != 32:
+                raise SystemExit(f"build.py: {year} projections cover {len(totals)} teams, need 32")
+            proj[year] = totals
+            projmeta[year] = {"source": pj.get("source"), "asOf": pj.get("asOf")}
+            print(f"       projections: {pj.get('source')} as of {pj.get('asOf')} "
+                  f"· sum {sum(totals.values()):g} of 272")
+
         tot = {p: sum(table[a][0] + table[a][2] * league["tieValue"] for a in t)
                for p, t in rosters.items()}
         lead = max(tot, key=tot.get)
@@ -159,6 +170,10 @@ def main():
         "const CALL=" + json.dumps({k: v["call"] for k, v in players.items()}, separators=(",", ":")) + ";\n"
         "const FULL=" + json.dumps({k: v["full"] for k, v in players.items()}, separators=(",", ":")) + ";\n"
         "const YEARS=" + json.dumps(sorted(out_seasons, reverse=True), separators=(",", ":")) + ";\n"
+        "const PROJ=" + json.dumps(proj, separators=(",", ":")) + ";\n"
+        "const PROJMETA=" + json.dumps(projmeta, separators=(",", ":")) + ";\n"
+        "const RULES=" + json.dumps({"payout": league.get("payout"), "tiebreak": league.get("tiebreak")},
+                                    separators=(",", ":")) + ";\n"
         "const BUILT=" + json.dumps(datetime.datetime.now(datetime.timezone.utc)
                                     .strftime("%Y-%m-%d %H:%M")) + ";\n"
     )
@@ -166,7 +181,16 @@ def main():
     if "/*__DATA__*/" not in tpl:
         raise SystemExit("build.py: template.html is missing its /*__DATA__*/ marker")
     html = tpl.replace("/*__DATA__*/", blob)
-    with open(os.path.join(ROOT, "index.html"), "w") as f:
+
+    # The build stamp changes every run. Compare with it masked out, so a day when
+    # nothing actually happened leaves the file — and therefore git — untouched.
+    out = os.path.join(ROOT, "index.html")
+    stamp = re.compile(r'const BUILT="[^"]*";')
+    old_html = open(out).read() if os.path.exists(out) else ""
+    if stamp.sub("", old_html) == stamp.sub("", html):
+        print(f"no change — index.html left alone ({len(old_html):,} bytes)")
+        return
+    with open(out, "w") as f:
         f.write(html)
     print(f"built index.html ({len(html):,} bytes) · standings changed: {any_change}")
 
